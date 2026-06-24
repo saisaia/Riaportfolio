@@ -1,461 +1,961 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Czar's Neural Interface v2</title>
+    <title>Ria Arnaiz Mendez | Virtual Assistant Portfolio</title>
     <style>
+        /* Global Styles */
         :root {
-            --bg-color: #050505;
-            /* Primary (Gift/Safe) Colors */
-            --primary: #10a37f;
-            --primary-glow: rgba(16, 163, 127, 0.4);
-            /* Danger (Private/Warning) Colors */
-            --danger: #dc2626;
-            --danger-glow: rgba(220, 38, 38, 0.5);
-            
-            --glass-bg: rgba(20, 20, 20, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --text-main: #ffffff;
-            --text-muted: #8e8ea0;
+            --primary-blue: #144b7a;
+            --light-blue: #1e8bcc;
+            --accent-yellow: #f8b941;
+            --text-dark: #333333;
+            --bg-light: #f8f9fa;
         }
 
-        * { box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
         body {
-            margin: 0;
-            padding: 20px 0;
-            background-color: var(--bg-color);
-            font-family: 'Söhne', 'Segoe UI', Helvetica, Arial, sans-serif;
-            color: var(--text-main);
-            min-height: 100vh; /* Allow scrolling if content is tall */
+            background-color: #ffffff;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Header Section */
+        header {
+            background-color: var(--primary-blue);
+            color: #ffffff;
+            padding: 3rem 10%;
             display: flex;
-            justify-content: center;
             align-items: center;
-            overflow-x: hidden; /* Prevent horizontal scroll */
+            gap: 3rem;
         }
 
-        /* --- BACKGROUND ANIMATION --- */
-        #neural-canvas {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; opacity: 0.4; pointer-events: none;
+        .profile-container {
+            flex-shrink: 0;
         }
 
-        /* --- MAIN CONTAINER --- */
-        .interface-container {
-            position: relative;
-            z-index: 10;
-            width: 90%;
-            max-width: 1000px;
+        .profile-pic {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 6px solid #85b4d9;
+            object-fit: cover;
+            background-color: white; 
+        }
+
+        .header-text h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+
+        .header-text h2 {
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: #d1e3f2;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-info span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn {
+            background-color: var(--accent-yellow);
+            color: var(--primary-blue);
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #e5a735;
+        }
+
+        /* Main Content Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 5%;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        /* Professional Summary */
+        .summary {
+            margin-bottom: 3rem;
+        }
+
+        .summary p {
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .summary ul {
+            padding-left: 1.5rem;
+        }
+
+        .summary ul li {
+            margin-bottom: 0.4rem;
+        }
+
+        /* Toolkit Section */
+        .toolkit-box {
+            background-color: var(--light-blue);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 3rem;
+        }
+
+        .toolkit-box h2 {
+            color: #ffffff;
+        }
+
+        .tags-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .tag {
+            background-color: #ffffff;
+            color: var(--primary-blue);
+            padding: 12px 10px;
+            border-radius: 8px;
             text-align: center;
-            opacity: 0;
-            animation: fadeIn 1s ease forwards 0.5s;
-            padding-bottom: 50px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* --- HEADER --- */
-        .brand-header { margin-bottom: 30px; }
-        .gpt-logo {
-            width: 60px; height: 60px; fill: var(--text-main);
-            margin-bottom: 15px; filter: drop-shadow(0 0 15px var(--primary-glow));
-            animation: float 6s ease-in-out infinite;
-        }
-        h1 {
-            font-size: 2.5rem; font-weight: 600; margin: 0;
-            background: linear-gradient(to right, #fff, #b4b4b4);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .subtitle { color: var(--text-muted); margin-top: 5px; font-size: 1rem; }
-
-        .system-alert {
-            display: inline-flex; align-items: center; gap: 10px; margin-top: 25px;
-            padding: 12px 24px; background: rgba(234, 179, 8, 0.1);
-            border: 1px solid #eab308; border-radius: 50px; color: #fef08a;
-            font-size: 0.9rem; font-family: monospace;
+        /* Value Proposition Section */
+        .value-box {
+            background-color: var(--primary-blue);
+            padding: 2.5rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 3.5rem;
         }
 
-        /* --- SHARED CARD STYLES --- */
-        .glass-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
-            cursor: pointer;
+        .value-box h2 {
+            color: #ffffff;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .card h3 {
+            color: var(--primary-blue);
+            font-size: 1.15rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+        }
+
+        /* Split Layout for Experience & Education */
+        .split-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        /* Timeline (Experience) */
+        .timeline {
+            border-left: 3px solid #cbd5e1;
+            margin-left: 150px; 
+            padding-left: 35px;
+        }
+
+        .timeline-item {
             position: relative;
+            margin-bottom: 3.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -43px;
+            top: 5px;
+            width: 15px;
+            height: 15px;
+            background-color: var(--primary-blue);
+            border-radius: 50%;
+        }
+
+        .timeline-date {
+            position: absolute;
+            left: -190px;
+            top: 0;
+            width: 140px;
+            text-align: right;
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .timeline-content h3 {
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content h4 {
+            color: var(--text-dark);
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .timeline-content ul {
+            padding-left: 1.2rem;
+            font-size: 0.95rem;
+        }
+
+        .timeline-content ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Education Card */
+        .edu-container {
+            border-radius: 12px;
             overflow: hidden;
-        }
-        .glass-card::before {
-            content: ''; position: absolute; top:0; left:0; right:0; bottom:0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
-            opacity: 0; transition: opacity 0.4s; z-index: -1;
-        }
-        .glass-card:hover::before { opacity: 1; }
-
-        /* --- GIFT CARDS SECTION --- */
-        .grid-layout {
-            display: flex; justify-content: center; gap: 40px; margin-top: 40px; flex-wrap: wrap;
-        }
-        .user-card {
-            width: 280px; height: 380px; border-radius: 24px; padding: 30px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .user-card:hover {
-            transform: translateY(-15px) scale(1.02);
-            border-color: var(--primary);
-            box-shadow: 0 20px 50px -10px var(--primary-glow);
-        }
-        .avatar-circle {
-            width: 80px; height: 80px; border-radius: 50%; background: #1a1a1a;
-            display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
-            border: 2px solid var(--glass-border); font-size: 1.5rem; transition: all 0.4s;
-        }
-        .user-card:hover .avatar-circle {
-            background: var(--primary); border-color: #fff; color: #000; transform: rotate(360deg);
-        }
-        .card-name { font-size: 1.5rem; font-weight: 700; margin-bottom: 5px; }
-        .card-desc { color: var(--text-muted); font-size: 0.9rem; }
-        .card-badge {
-            margin-top: 20px; padding: 6px 12px; border-radius: 20px;
-            background: rgba(16, 163, 127, 0.1); color: var(--primary);
-            font-size: 0.75rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        /* --- SECTION DIVIDER --- */
-        .section-divider {
-            margin: 60px auto 30px;
-            width: 100%;
-            max-width: 600px;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--text-muted); font-family: monospace; letter-spacing: 2px;
-        }
-        .section-divider::before, .section-divider::after {
-            content: ''; height: 1px; background: var(--glass-border); flex: 1; margin: 0 20px;
-            box-shadow: 0 0 10px var(--danger-glow);
+        .edu-header {
+            background-color: var(--light-blue);
+            color: #ffffff;
+            padding: 1.2rem;
+            font-size: 1.4rem;
+            font-weight: 700;
         }
 
-        /* --- PRIVATE SECTION --- */
-        .private-grid {
-            display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;
-            max-width: 800px; margin: 0 auto;
+        .edu-body {
+            background-color: var(--bg-light);
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
         }
-        .private-card {
-            width: 140px; height: 140px; border-radius: 16px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 10px; font-weight: 600; font-size: 0.9rem; color: var(--text-muted);
-            border-color: rgba(220, 38, 38, 0.2); /* Subtle red tint border */
-        }
-        .private-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--danger);
-            box-shadow: 0 10px 30px -5px var(--danger-glow);
-            color: var(--text-main);
-        }
-        .lock-icon { font-size: 1.8rem; transition: color 0.3s; }
-        .private-card:hover .lock-icon { color: var(--danger); }
 
+        .edu-body h4 {
+            color: var(--primary-blue);
+            font-size: 1.15rem;
+            margin-bottom: 0.5rem;
+        }
 
-        /* --- MODALS SHARED --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 100;
-            display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.4s;
+        .edu-body p {
+            color: #475569;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
         }
-        .modal-active { opacity: 1; pointer-events: all; }
-        .modal-box {
-            background: #0f0f0f; border: 1px solid var(--glass-border);
-            width: 90%; max-width: 450px; padding: 40px; border-radius: 24px;
-            text-align: center; transform: scale(0.9); position: relative; overflow: hidden;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-        }
-        .modal-active .modal-box { transform: scale(1); }
-        .btn-close {
-            position: absolute; top: 20px; right: 20px; background: none;
-            border: none; color: #555; cursor: pointer; font-size: 1.5rem;
-        }
-        .btn-close:hover { color: white; }
 
-        /* --- AUTH & REVEAL MODAL SPECIFICS --- */
-        .input-group { margin: 30px 0; }
-        .pass-input {
-            width: 100%; background: transparent; border: none; border-bottom: 2px solid #333;
-            padding: 10px; color: white; font-size: 1.5rem; text-align: center; font-family: monospace; outline: none; transition: border-color 0.3s;
+        .edu-body .italic-text {
+            font-style: italic;
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 15px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 10px;
         }
-        .pass-input:focus { border-color: var(--primary); }
-        .btn-unlock {
-            background: white; color: black; border: none; padding: 16px 40px;
-            border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s; width: 100%;
-        }
-        .btn-unlock:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(255,255,255,0.3); }
-        .reveal-row {
-            display: flex; justify-content: space-between; padding: 15px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left;
-        }
-        .reveal-label { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; }
-        .reveal-value { font-family: monospace; font-size: 1.1rem; color: var(--primary); font-weight: bold;}
-        .hack-text { font-family: monospace; }
 
-        /* --- WARNING MODAL SPECIFICS --- */
-        .danger-box {
-            border-color: var(--danger);
-            box-shadow: 0 0 50px var(--danger-glow);
+        /* Footer */
+        footer {
+            background-color: var(--primary-blue);
+            color: #ffffff;
+            padding: 3rem 10%;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
         }
-        .warning-header {
-            color: var(--danger); font-size: 4rem; margin-bottom: 10px;
-        }
-        .glitch-text {
-            font-weight: 800; font-size: 1.8rem; text-transform: uppercase;
-            position: relative; color: white; mix-blend-mode: lighten;
-        }
-        .glitch-text::before, .glitch-text::after {
-            content: attr(data-text); position: absolute; top: 0; width: 100%; background: #0f0f0f; clip: rect(0, 0, 0, 0);
-        }
-        .glitch-text::before { left: -2px; text-shadow: 2px 0 var(--danger); animation: glitch-anim 2s infinite linear alternate-reverse; }
-        .glitch-text::after { left: 2px; text-shadow: -2px 0 #00ffff; animation: glitch-anim 3s infinite linear alternate; }
-        
-        .warning-body { color: var(--text-muted); margin: 20px 0 30px; font-family: monospace; line-height: 1.6; }
-        .highlight-danger { color: var(--danger); font-weight: bold; }
-        .btn-danger { background: var(--danger); color: white; border: none; }
-        .btn-danger:hover { background: #b91c1c; box-shadow: 0 0 30px var(--danger-glow); }
 
-        /* Animations */
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        @keyframes fadeIn { to { opacity: 1; } }
-        .shake { animation: shake 0.4s ease-in-out; border-bottom-color: #ef4444 !important; color: #ef4444; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
-        @keyframes glitch-anim {
-            0% { clip: rect(42px, 9999px, 44px, 0); } 5% { clip: rect(12px, 9999px, 59px, 0); } 10% { clip: rect(48px, 9999px, 29px, 0); } 15.0% { clip: rect(42px, 9999px, 73px, 0); } 20% { clip: rect(63px, 9999px, 27px, 0); } 25% { clip: rect(34px, 9999px, 55px, 0); } 30.0% { clip: rect(86px, 9999px, 73px, 0); } 35% { clip: rect(20px, 9999px, 20px, 0); } 40% { clip: rect(26px, 9999px, 60px, 0); } 45% { clip: rect(25px, 9999px, 66px, 0); } 50% { clip: rect(57px, 9999px, 98px, 0); } 55.0% { clip: rect(5px, 9999px, 46px, 0); } 60.0% { clip: rect(82px, 9999px, 31px, 0); } 65% { clip: rect(54px, 9999px, 27px, 0); } 70% { clip: rect(28px, 9999px, 99px, 0); } 75% { clip: rect(45px, 9999px, 69px, 0); } 80% { clip: rect(23px, 9999px, 85px, 0); } 85.0% { clip: rect(54px, 9999px, 84px, 0); } 90% { clip: rect(45px, 9999px, 47px, 0); } 95% { clip: rect(37px, 9999px, 20px, 0); } 100% { clip: rect(4px, 9999px, 91px, 0); }
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            color: var(--accent-yellow);
+        }
+
+        .footer-section p {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive Design */
+        @media(max-width: 900px) {
+            header { flex-direction: column; text-align: center; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .split-layout { grid-template-columns: 1fr; }
+            .timeline { margin-left: 0; border-left: none; padding-left: 0; }
+            .timeline-item::before { display: none; }
+            .timeline-date { position: relative; left: 0; text-align: left; margin-bottom: 0.5rem; font-weight: bold; color: var(--primary-blue); width: auto; }
         }
     </style>
 </head>
 <body>
 
-    <canvas id="neural-canvas"></canvas>
+    <!-- Header -->
+    <header>
+        <div class="profile-container">
+            <!-- IMPORTANT: Keep your image file named 'profile.jpg' -->
+            <img src="profile.jpg" alt="Ria Arnaiz Mendez" class="profile-pic">
+        </div>
+        <div class="header-text">
+            <h1>Ria Arnaiz Mendez</h1>
+            <h2>Professional Virtual Assistant & Operations Specialist</h2>
+            <div class="contact-info">
+                <span>✉️ riaarnaizmendez@yahoo.com.ph</span>
+                <span>📞 +63 956 144 4869</span>
+                <span>📍 Philippines</span>
+            </div>
+            <a href="mailto:riaarnaizmendez@yahoo.com.ph" class="btn">Get In Touch</a>
+        </div>
+    </header>
 
-    <div class="interface-container" id="main-ui">
+    <div class="container">
         
-        <div class="brand-header">
-            <svg class="gpt-logo" viewBox="0 0 24 24"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 11.2414.7439a6.1967 6.1967 0 0 0-5.6533 2.8913c-.3301.672-.548 1.393-.6535 2.1384a6.0462 6.0462 0 0 0-4.803 5.9813c0 .7255.1286 1.4383.3807 2.1152a5.9847 5.9847 0 0 0 .5157 4.9108 6.0462 6.0462 0 0 0 6.5098 2.9 6.0651 6.0651 0 0 0 4.0146 1.2665 6.1967 6.1967 0 0 0 5.6533-2.8913c.3301-.672.548-1.393.6535-2.1384a6.0462 6.0462 0 0 0 4.803-5.9813 5.9847 5.9847 0 0 0-.3807-2.1152zm-10.2819 5.6137l-2.9667-1.7129 1.1331-1.9624L12 12.8957l1.8336-1.1362 1.1331 1.9624L12 15.4348z"/></svg>
-            <h1>Czar's GPT Vault v3.1</h1>
-            <div class="subtitle">Secure Subscription Transfer Protocol</div>
+        <!-- Professional Summary -->
+        <section class="summary">
+            <h2 class="section-title">Professional Summary</h2>
+            <p>Highly organized, detail-oriented, and tech-savvy Virtual Assistant with over 18 years of comprehensive experience in administrative support, operations management, and customer service. Proven ability to streamline daily workflows, manage complex tasks under tight deadlines, and facilitate seamless cross-departmental communication. Highly adaptable and ready to leverage a strong background in data management, client relations, and office coordination to provide exceptional remote support and drive operational efficiency for a forward-thinking team.</p>
+        </section>
 
-            <div class="system-alert">
-                <span>⚠️</span>
-                <span><b>SECURITY NOTICE:</b> The Unlock Password is identical to the account password.</span>
+        <!-- Virtual Assistant Toolkit -->
+        <section class="toolkit-box">
+            <h2 class="section-title" style="color: white;">Virtual Assistant Toolkit</h2>
+            <div class="tags-grid">
+                <div class="tag">Remote Office Coordination</div>
+                <div class="tag">Calendar Management</div>
+                <div class="tag">Precise Data Entry</div>
+                <div class="tag">Workflow Optimization</div>
+                <div class="tag">Strict Deadline Management</div>
+                <div class="tag">Conflict Resolution</div>
+                <div class="tag">Client Onboarding</div>
+                <div class="tag">Cloud Document Management</div>
             </div>
-        </div>
+        </section>
 
-        <div class="grid-layout">
-            <div class="user-card glass-card" onclick="openAuth(1)">
-                <div class="avatar-circle">T</div>
-                <div class="card-name">TIMLING</div>
-                <div class="card-desc">Encrypted Gift Module</div>
-                <div class="card-badge">ChatGPT Plus • 12 Months</div>
-            </div>
-            <div class="user-card glass-card" onclick="openAuth(2)">
-                <div class="avatar-circle">J</div>
-                <div class="card-name">ATE JOY</div>
-                <div class="card-desc">Encrypted Gift Module</div>
-                <div class="card-badge">ChatGPT Plus • 12 Months</div>
-            </div>
-        </div>
-
-        <div class="section-divider">RESTRICTED // ADMIN MODULES</div>
-
-        <div class="private-grid">
-            <div class="private-card glass-card" onclick="showWarning('YouTube Premium')">
-                <div class="lock-icon">🔒</div> YouTube
-            </div>
-            <div class="private-card glass-card" onclick="showWarning('Netflix Ultra')">
-                <div class="lock-icon">🔒</div> Netflix
-            </div>
-            <div class="private-card glass-card" onclick="showWarning('Gemini Advanced')">
-                <div class="lock-icon">🔒</div> Gemini
-            </div>
-            <div class="private-card glass-card" onclick="showWarning('Grammarly Pro')">
-                <div class="lock-icon">🔒</div> Grammarly
-            </div>
-            <div class="private-card glass-card" onclick="showWarning('Quillbot Premium')">
-                <div class="lock-icon">🔒</div> Quillbot
-            </div>
-        </div>
-
-    </div>
-
-    <div class="modal-overlay" id="auth-modal">
-        <div class="modal-box">
-            <button class="btn-close" onclick="closeModal('auth-modal')">&times;</button>
-            <h2 style="margin-bottom: 5px;">Verify Identity</h2>
-            <p style="color: #888; font-size: 0.9rem;">Enter passcode for <span id="target-name" style="color:white; font-weight:bold;"></span></p>
-            <div class="input-group">
-                <input type="text" id="pass-input" class="pass-input" placeholder="ENTER PASSWORD" autocomplete="off">
-            </div>
-            <button class="btn-unlock" onclick="attemptUnlock()">DECRYPT DATA</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="reveal-modal">
-        <div class="modal-box" style="border-color: var(--primary);">
-            <button class="btn-close" onclick="closeModal('reveal-modal')">&times;</button>
-            <div style="color: var(--primary); font-size: 3rem; margin-bottom: 10px;">🔓</div>
-            <h2 style="margin: 0 0 20px 0;">Access Granted</h2>
-            <div class="reveal-content">
-                <div class="reveal-row">
-                    <span class="reveal-label">Status</span>
-                    <span class="reveal-value" style="color: #fff;">12 Months Active</span>
+        <!-- Value Proposition / Core Competencies -->
+        <section class="value-box">
+            <h2 class="section-title" style="color: white;">Core Competencies</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>Operations & Projects</h3>
+                    <p>Skilled in multitasking, workflow optimization, and strict deadline management. Capable of keeping fast-paced pipelines organized and on track.</p>
                 </div>
-                <div class="reveal-row">
-                    <span class="reveal-label">Email</span>
-                    <span class="reveal-value hack-text" id="final-email">loading...</span>
+                <div class="card">
+                    <h3>Client Relations</h3>
+                    <p>Expert in professional communication, rapid conflict resolution, and client onboarding to foster long-term professional relationships.</p>
                 </div>
-                <div class="reveal-row" style="border-bottom: none;">
-                    <span class="reveal-label">Password</span>
-                    <span class="reveal-value hack-text" id="final-pass">loading...</span>
+                <div class="card">
+                    <h3>Technical Aptitude</h3>
+                    <p>Proficient in essential computer applications, cloud-based document management, and quick adaptation to new digital tools.</p>
                 </div>
             </div>
-            <a href="https://chat.openai.com" target="_blank" class="btn-unlock" style="display: block; text-decoration: none; margin-top: 30px; background: var(--primary); color: white;">
-                GO // LAUNCH CHATGPT
-            </a>
-        </div>
-    </div>
+        </section>
 
-    <div class="modal-overlay" id="warning-modal">
-        <div class="modal-box danger-box">
-            <button class="btn-close" onclick="closeModal('warning-modal')">&times;</button>
-            <div class="warning-header">⛔</div>
-            <h2 class="glitch-text" data-text="ACCESS DENIED">ACCESS DENIED</h2>
+        <!-- Split Layout: Experience & Education -->
+        <section class="split-layout">
             
-            <div class="warning-body">
-                SECURITY PROTOCOL BETA-7 ENGAGED.<br>
-                THE MODULE <span id="warning-target" class="highlight-danger"></span> IS CLASSIFIED.<br><br>
-                THIS NODE IS RESERVED FOR <span class="highlight-danger">ADMIN FULL CONTROL</span>. YOUR NEURAL SIGNATURE DOES NOT HAVE CLEARANCE.
+            <!-- Professional Experience -->
+            <div>
+                <h2 class="section-title">Professional Experience</h2>
+                <div class="timeline">
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">Sept 17, 2018 -<br>Apr 30, 2026</div>
+                        <div class="timeline-content">
+                            <h3>Administrative Assistant</h3>
+                            <h4>Pitakamo IT Solutions and Marketing Corp</h4>
+                            <ul>
+                                <li><strong>Provided</strong> comprehensive administrative and operational support, serving as the central point of contact for internal workflows.</li>
+                                <li><strong>Managed</strong> and prioritized multiple overlapping tasks and project pipelines, consistently meeting strict deadlines in a fast-paced environment.</li>
+                                <li><strong>Coordinated</strong> clear, effective communication between technical departments and clients, ensuring smooth project execution and preventing bottlenecks.</li>
+                                <li><strong>Maintained</strong> meticulous digital records, business documentation, and routine operational reports with a high degree of accuracy.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-date">Feb 01, 2016 -<br>Sept 02, 2017</div>
+                        <div class="timeline-content">
+                            <h3>Office Staff</h3>
+                            <h4>Expresspay Inc.</h4>
+                            <ul>
+                                <li><strong>Supported</strong> daily office operations and optimized administrative functions to improve overall team efficiency.</li>
+                                <li><strong>Handled</strong> highly sensitive corporate documents, financial reports, and filing systems with strict confidentiality and precision.</li>
+                                <li><strong>Resolved</strong> frontline customer concerns and operational issues swiftly, maintaining excellent service standards and minimizing escalations.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-date">Dec 4, 2007 -<br>Feb 16, 2016</div>
+                        <div class="timeline-content">
+                            <h3>Sales Staff</h3>
+                            <h4>Unisilver Group International Corporation</h4>
+                            <ul>
+                                <li><strong>Assisted</strong> high volumes of daily customers, delivering proactive and empathetic service to ensure optimal client satisfaction.</li>
+                                <li><strong>Achieved</strong> and consistently exceeded monthly sales targets, directly contributing to the company's long-term revenue growth.</li>
+                                <li><strong>Cultivated</strong> lasting customer relationships through reliable support, active listening, and comprehensive product knowledge.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-            
-            <button class="btn-unlock btn-danger" onclick="closeModal('warning-modal')">
-                ACKNOWLEDGE & TERMINATE SESSION
-            </button>
-        </div>
+
+            <!-- Education -->
+            <div>
+                <div class="edu-container">
+                    <div class="edu-header">Education</div>
+                    <div class="edu-body">
+                        <h4>BS Computer Engineering</h4>
+                        <p>Eulogio "Amang" Rodriguez Institute of Science and Technology</p>
+                        <p style="margin-top: 5px; color: var(--light-blue); font-weight: bold;">April 2004</p>
+                        <p class="italic-text">Leveraging an engineering background to provide strong analytical problem-solving skills and rapid technical adaptability for modern online business tools.</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
     </div>
 
+    <!-- Footer -->
+    <footer>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <p><a href="mailto:riaarnaizmendez@yahoo.com.ph" style="color: white; text-decoration: none;">✉️ Email Me</a></p>
+            <p><a href="tel:+639561444869" style="color: white; text-decoration: none;">📞 Call Now</a></p>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Details</h3>
+            <p>✉️ riaarnaizmendez@yahoo.com.ph</p>
+            <p>📍 Philippines</p>
+        </div>
+    </footer>
 
-    <script>
-        // CONFIGURATION
-        const DATA = {
-            1: { name: "Timling", email: "Timling1011@gmail.com", pass: "@SAsa123123" },
-            2: { name: "Ate Joy", email: "yojjoy461@gmail.com", pass: "@SAsa123123" }
-        };
-
-        let currentId = null;
-
-        // 1. NEURAL BACKGROUND ANIMATION (Slightly adjusted colors for new theme)
-        const canvas = document.getElementById('neural-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let points = [];
-
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            initPoints();
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ria Arnaiz Mendez | Virtual Assistant Portfolio</title>
+    <style>
+        /* Global Styles */
+        :root {
+            --primary-blue: #144b7a;
+            --light-blue: #1e8bcc;
+            --accent-yellow: #f8b941;
+            --text-dark: #333333;
+            --bg-light: #f8f9fa;
         }
 
-        function initPoints() {
-            points = [];
-            const count = Math.floor(width * height / 18000); 
-            for(let i=0; i<count; i++) {
-                points.push({
-                    x: Math.random() * width, y: Math.random() * height,
-                    vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3
-                });
-            }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        function draw() {
-            ctx.clearRect(0,0,width,height);
-            ctx.fillStyle = '#10a37f'; // Primary color dots
-            ctx.strokeStyle = 'rgba(16, 163, 127, 0.1)'; // Primary color lines
-
-            for(let i=0; i<points.length; i++) {
-                let p = points[i];
-                p.x += p.vx; p.y += p.vy;
-                if(p.x < 0 || p.x > width) p.vx *= -1;
-                if(p.y < 0 || p.y > height) p.vy *= -1;
-                ctx.beginPath(); ctx.arc(p.x, p.y, 1.5, 0, Math.PI*2); ctx.fill();
-                for(let j=i+1; j<points.length; j++) {
-                    let p2 = points[j];
-                    let dist = Math.sqrt((p.x-p2.x)**2 + (p.y-p2.y)**2);
-                    if(dist < 120) {
-                        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
-                    }
-                }
-            }
-            requestAnimationFrame(draw);
-        }
-        window.addEventListener('resize', resize);
-        resize(); draw();
-
-
-        // 2. APP LOGIC
-        const authModal = document.getElementById('auth-modal');
-        const revealModal = document.getElementById('reveal-modal');
-        const warningModal = document.getElementById('warning-modal');
-        const passInput = document.getElementById('pass-input');
-
-        function openAuth(id) {
-            currentId = id;
-            document.getElementById('target-name').innerText = DATA[id].name;
-            authModal.classList.add('modal-active');
-            passInput.value = ''; passInput.focus();
+        body {
+            background-color: #ffffff;
+            color: var(--text-dark);
+            line-height: 1.6;
         }
 
-        // NEW FUNCTION FOR PRIVATE SECTION
-        function showWarning(serviceName) {
-            document.getElementById('warning-target').innerText = serviceName.toUpperCase();
-            warningModal.classList.add('modal-active');
+        /* Header Section */
+        header {
+            background-color: var(--primary-blue);
+            color: #ffffff;
+            padding: 3rem 10%;
+            display: flex;
+            align-items: center;
+            gap: 3rem;
         }
 
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('modal-active');
+        .profile-container {
+            flex-shrink: 0;
         }
 
-        function attemptUnlock() {
-            const input = passInput.value.trim();
-            const correctPass = DATA[currentId].pass;
-            if (input === correctPass) {
-                authModal.classList.remove('modal-active');
-                revealModal.classList.add('modal-active');
-                runHackerEffect('final-email', DATA[currentId].email);
-                setTimeout(() => { runHackerEffect('final-pass', DATA[currentId].pass); }, 800);
-            } else {
-                passInput.classList.add('shake');
-                setTimeout(() => passInput.classList.remove('shake'), 400);
-            }
+        .profile-pic {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 6px solid #85b4d9;
+            object-fit: cover;
+            background-color: white; 
         }
 
-        passInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') attemptUnlock();
-        });
-
-        // 3. MATRIX DECRYPTION EFFECT
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*";
-        function runHackerEffect(elementId, finalText) {
-            const el = document.getElementById(elementId);
-            let iterations = 0;
-            const interval = setInterval(() => {
-                el.innerText = finalText.split("").map((letter, index) => {
-                        if(index < iterations) return finalText[index];
-                        return chars[Math.floor(Math.random() * chars.length)];
-                    }).join("");
-                if(iterations >= finalText.length) clearInterval(interval);
-                iterations += 1/2;
-            }, 30);
+        .header-text h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
         }
-    </script>
+
+        .header-text h2 {
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: #d1e3f2;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-info span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn {
+            background-color: var(--accent-yellow);
+            color: var(--primary-blue);
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #e5a735;
+        }
+
+        /* Main Content Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2.5rem 5%;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        /* Professional Summary */
+        .summary {
+            margin-bottom: 3rem;
+        }
+
+        .summary p {
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .summary ul {
+            padding-left: 1.5rem;
+        }
+
+        .summary ul li {
+            margin-bottom: 0.4rem;
+        }
+
+        /* Toolkit Section */
+        .toolkit-box {
+            background-color: var(--light-blue);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 3rem;
+        }
+
+        .toolkit-box h2 {
+            color: #ffffff;
+        }
+
+        .tags-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .tag {
+            background-color: #ffffff;
+            color: var(--primary-blue);
+            padding: 12px 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Value Proposition Section */
+        .value-box {
+            background-color: var(--primary-blue);
+            padding: 2.5rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 3.5rem;
+        }
+
+        .value-box h2 {
+            color: #ffffff;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .card h3 {
+            color: var(--primary-blue);
+            font-size: 1.15rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+        }
+
+        /* Split Layout for Experience & Education */
+        .split-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        /* Timeline (Experience) */
+        .timeline {
+            border-left: 3px solid #cbd5e1;
+            margin-left: 150px; 
+            padding-left: 35px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 3.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -43px;
+            top: 5px;
+            width: 15px;
+            height: 15px;
+            background-color: var(--primary-blue);
+            border-radius: 50%;
+        }
+
+        .timeline-date {
+            position: absolute;
+            left: -190px;
+            top: 0;
+            width: 140px;
+            text-align: right;
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .timeline-content h3 {
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content h4 {
+            color: var(--text-dark);
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .timeline-content ul {
+            padding-left: 1.2rem;
+            font-size: 0.95rem;
+        }
+
+        .timeline-content ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Education Card */
+        .edu-container {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .edu-header {
+            background-color: var(--light-blue);
+            color: #ffffff;
+            padding: 1.2rem;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .edu-body {
+            background-color: var(--bg-light);
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .edu-body h4 {
+            color: var(--primary-blue);
+            font-size: 1.15rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .edu-body p {
+            color: #475569;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .edu-body .italic-text {
+            font-style: italic;
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 15px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 10px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary-blue);
+            color: #ffffff;
+            padding: 3rem 10%;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            color: var(--accent-yellow);
+        }
+
+        .footer-section p {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive Design */
+        @media(max-width: 900px) {
+            header { flex-direction: column; text-align: center; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .split-layout { grid-template-columns: 1fr; }
+            .timeline { margin-left: 0; border-left: none; padding-left: 0; }
+            .timeline-item::before { display: none; }
+            .timeline-date { position: relative; left: 0; text-align: left; margin-bottom: 0.5rem; font-weight: bold; color: var(--primary-blue); width: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="profile-container">
+            <!-- IMPORTANT: Keep your image file named 'profile.jpg' -->
+            <img src="profile.jpg" alt="Ria Arnaiz Mendez" class="profile-pic">
+        </div>
+        <div class="header-text">
+            <h1>Ria Arnaiz Mendez</h1>
+            <h2>Professional Virtual Assistant & Operations Specialist</h2>
+            <div class="contact-info">
+                <span>✉️ riaarnaizmendez@yahoo.com.ph</span>
+                <span>📞 +63 956 144 4869</span>
+                <span>📍 Philippines</span>
+            </div>
+            <a href="mailto:riaarnaizmendez@yahoo.com.ph" class="btn">Get In Touch</a>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <!-- Professional Summary -->
+        <section class="summary">
+            <h2 class="section-title">Professional Summary</h2>
+            <p>Highly organized, detail-oriented, and tech-savvy Virtual Assistant with over 18 years of comprehensive experience in administrative support, operations management, and customer service. Proven ability to streamline daily workflows, manage complex tasks under tight deadlines, and facilitate seamless cross-departmental communication. Highly adaptable and ready to leverage a strong background in data management, client relations, and office coordination to provide exceptional remote support and drive operational efficiency for a forward-thinking team.</p>
+        </section>
+
+        <!-- Virtual Assistant Toolkit -->
+        <section class="toolkit-box">
+            <h2 class="section-title" style="color: white;">Virtual Assistant Toolkit</h2>
+            <div class="tags-grid">
+                <div class="tag">Remote Office Coordination</div>
+                <div class="tag">Calendar Management</div>
+                <div class="tag">Precise Data Entry</div>
+                <div class="tag">Workflow Optimization</div>
+                <div class="tag">Strict Deadline Management</div>
+                <div class="tag">Conflict Resolution</div>
+                <div class="tag">Client Onboarding</div>
+                <div class="tag">Cloud Document Management</div>
+            </div>
+        </section>
+
+        <!-- Value Proposition / Core Competencies -->
+        <section class="value-box">
+            <h2 class="section-title" style="color: white;">Core Competencies</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <h3>Operations & Projects</h3>
+                    <p>Skilled in multitasking, workflow optimization, and strict deadline management. Capable of keeping fast-paced pipelines organized and on track.</p>
+                </div>
+                <div class="card">
+                    <h3>Client Relations</h3>
+                    <p>Expert in professional communication, rapid conflict resolution, and client onboarding to foster long-term professional relationships.</p>
+                </div>
+                <div class="card">
+                    <h3>Technical Aptitude</h3>
+                    <p>Proficient in essential computer applications, cloud-based document management, and quick adaptation to new digital tools.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Split Layout: Experience & Education -->
+        <section class="split-layout">
+            
+            <!-- Professional Experience -->
+            <div>
+                <h2 class="section-title">Professional Experience</h2>
+                <div class="timeline">
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">Sept 17, 2018 -<br>Apr 30, 2026</div>
+                        <div class="timeline-content">
+                            <h3>Administrative Assistant</h3>
+                            <h4>Pitakamo IT Solutions and Marketing Corp</h4>
+                            <ul>
+                                <li><strong>Provided</strong> comprehensive administrative and operational support, serving as the central point of contact for internal workflows.</li>
+                                <li><strong>Managed</strong> and prioritized multiple overlapping tasks and project pipelines, consistently meeting strict deadlines in a fast-paced environment.</li>
+                                <li><strong>Coordinated</strong> clear, effective communication between technical departments and clients, ensuring smooth project execution and preventing bottlenecks.</li>
+                                <li><strong>Maintained</strong> meticulous digital records, business documentation, and routine operational reports with a high degree of accuracy.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-date">Feb 01, 2016 -<br>Sept 02, 2017</div>
+                        <div class="timeline-content">
+                            <h3>Office Staff</h3>
+                            <h4>Expresspay Inc.</h4>
+                            <ul>
+                                <li><strong>Supported</strong> daily office operations and optimized administrative functions to improve overall team efficiency.</li>
+                                <li><strong>Handled</strong> highly sensitive corporate documents, financial reports, and filing systems with strict confidentiality and precision.</li>
+                                <li><strong>Resolved</strong> frontline customer concerns and operational issues swiftly, maintaining excellent service standards and minimizing escalations.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-date">Dec 4, 2007 -<br>Feb 16, 2016</div>
+                        <div class="timeline-content">
+                            <h3>Sales Staff</h3>
+                            <h4>Unisilver Group International Corporation</h4>
+                            <ul>
+                                <li><strong>Assisted</strong> high volumes of daily customers, delivering proactive and empathetic service to ensure optimal client satisfaction.</li>
+                                <li><strong>Achieved</strong> and consistently exceeded monthly sales targets, directly contributing to the company's long-term revenue growth.</li>
+                                <li><strong>Cultivated</strong> lasting customer relationships through reliable support, active listening, and comprehensive product knowledge.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Education -->
+            <div>
+                <div class="edu-container">
+                    <div class="edu-header">Education</div>
+                    <div class="edu-body">
+                        <h4>BS Computer Engineering</h4>
+                        <p>Eulogio "Amang" Rodriguez Institute of Science and Technology</p>
+                        <p style="margin-top: 5px; color: var(--light-blue); font-weight: bold;">April 2004</p>
+                        <p class="italic-text">Leveraging an engineering background to provide strong analytical problem-solving skills and rapid technical adaptability for modern online business tools.</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <p><a href="mailto:riaarnaizmendez@yahoo.com.ph" style="color: white; text-decoration: none;">✉️ Email Me</a></p>
+            <p><a href="tel:+639561444869" style="color: white; text-decoration: none;">📞 Call Now</a></p>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Details</h3>
+            <p>✉️ riaarnaizmendez@yahoo.com.ph</p>
+            <p>📍 Philippines</p>
+        </div>
+    </footer>
+
 </body>
 </html>
